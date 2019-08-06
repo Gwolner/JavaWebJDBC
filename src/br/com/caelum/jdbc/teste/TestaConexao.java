@@ -2,8 +2,7 @@ package br.com.caelum.jdbc.teste;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import br.com.caelum.jdbc.*;
+import br.com.caelum.jdbc.ConnectionFactory;
 
 
 public class TestaConexao {
@@ -13,5 +12,6 @@ public class TestaConexao {
 		Connection con = new ConnectionFactory().getConnection();
 		System.out.println("Conexão aberta!!");
 		con.close();
+		System.out.println("Conexão fechada!");
 	}
 }
