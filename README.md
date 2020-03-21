@@ -19,3 +19,9 @@ Nesse treinaemnto foram utilizados o BD MySQL e a IDE Eclipse Oxygen.
 
 
 A aplicação trata-se da persistencia nla bla bla ... 
+
+
+
+==================CONTEUDO DO WORD =========================
+
+
