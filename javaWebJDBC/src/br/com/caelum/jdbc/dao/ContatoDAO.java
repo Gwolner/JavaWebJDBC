@@ -11,7 +11,11 @@ import br.com.caelum.jdbc.modelo.Contato;
 
 
 public class ContatoDAO{
-	
+	/* DAO - Data Access Object
+	 * 
+	 * 
+	 * 
+	 */
 	private Connection conex;
 	
 	public ContatoDAO() {
