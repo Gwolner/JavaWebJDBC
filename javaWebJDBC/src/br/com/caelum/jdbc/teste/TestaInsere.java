@@ -135,11 +135,13 @@ stmt.close();
 			PreparedStatement stmt = con.prepareStatement(sql);
 			
 			//Preenchendo os valores
-			stmt.setString(1, "Eliane");
-			stmt.setString(2, "eli@dias.com");
+			stmt.setString(1, "Guilherme");
+			stmt.setString(2, "Guilherme@teste.com");
 			stmt.setString(3, "R. SQL 295 Workbench");
 			stmt.setDate(4, new java.sql.Date(
-					Calendar.getInstance().getTimeInMillis()));
+				//Obtendo a data atual do sistema!
+				Calendar.getInstance().getTimeInMillis())
+			);
 			
 			//Executa
 			stmt.execute();

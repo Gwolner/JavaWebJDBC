@@ -11,17 +11,22 @@ public class TestaInsereDAO {
 
 	public static void main(String[] args) throws SQLException {
 		
+		//Instancia do Java Bean
 		Contato contato = new Contato();
 		
-		contato.setNome("Juninho");
-		contato.setEmail("juninho@teste.com");
+		//Preenche seus campos
+		contato.setNome("Guilherme");
+		contato.setEmail("Guilherme@teste.com");
 		contato.setEndereco("R. Lantejoula, 298 - Abstergo");
 		contato.setDataNascimento(Calendar.getInstance());
 		
+		//Instancia do DAO
 		ContatoDAO dao = new ContatoDAO();
 		
+		//Adiciona o objeto Contato
 		dao.adicionar(contato);
 		
+		//Imprime confirmação de gravação
 		System.out.println("Gravado!");
 		
 		
