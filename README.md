@@ -47,12 +47,10 @@ CREATE DATABASE bd_jdbc;
 
 A classe ConnectionFactory é usada para implementar a fábrica, onde o objeto Connection tem sua construção encapsulada. Desta forma, além de evitar repetição de código para cada nova conexão, concentra em uma única classe os parametos que precisam ser alterados.
 ```java
-public Connection getConnection(){
-  try{
-    return DriverManager.getConnection("jdbc:mysql://localhost/bd_jdbc","root","root");
-  }catch(SQLException e){
-    throw new RuntimeException(e);
-  }
+try{
+	return DriverManager.getConnection("jdbc:mysql://localhost/bd_jdbc","root","root");
+}catch(SQLException e){
+	throw new RuntimeException(e);
 }
 ```
 <b>DriverManager</b> é a classe responsável por se comunicar com todos os drives que foram disponibilizados e o método <b>getConnection</b> indica qual banco desejamos nos conectar.
@@ -110,7 +108,7 @@ Por fim, o método <b>execute()</b> do objeto PreparedStatement executa o comand
 stmt.execute();
 ```
 
-## Fechando apropriadamente a conexão <b></b>
+## Fechando apropriadamente a conexão
 
 É comum que fechar uma conexão em um bloco <i>finally</i>, desta forma, mesmo que o código dentro do <i>try</i> lance uma <i>exception</i>, não ficará com este recurso aberto, pois poderá vazar algo precioso da aplicação
 ```java
@@ -128,36 +126,188 @@ try {
 }
 ```
 
-Além disto, há a estrutura de Java conhecida como <b>try-with-resources</b> que permite declarar e inicializar objetos dentro do <i>ry</i> que possual a caracteristica de <b>AutoCloseable<b>. Desta forma, ao terminar a execução do bloco <i>try</i>, o compilador invoca o método <b>close()</b> deste objeto. Isso garante que o código fique mais reduzido e organizado.
+Além disto, há a estrutura de Java conhecida como <b>try-with-resources</b> que permite declarar e inicializar objetos dentro do <i>ry</i> que possual a caracteristica de <b>AutoCloseable</b>. Desta forma, ao terminar a execução do bloco <i>try</i>, o compilador invoca o método <b>close()</b> deste objeto. Isso garante que o código fique mais reduzido e organizado.
 
 
-	 * A mÃ¡ pratica Statement
-	 * 
-	 * Em vez de usar o PreparedStatement, vocÃª pode usar uma interface mais simples 
-	 * chamada Statement, que simplesmente executa uma clÃ¡usula SQL no mÃ©todo 
-	 * execute:
-	 * 
-	 * Statement stmt = con.createStatement();
+## A má prática Statement
+
+Pode-se usar no lugar de PreparedStatement a classe <i>Statement</i> que executa a cláusula SQL diretamente no método execute().
+```java
+Statement stmt = con.createStatement();
 stmt.execute("INSERT INTO ...");
 stmt.close();
-	 * 
-	 * Mas prefira a classe PreparedStatement que Ã© mais rÃ¡pida que Statement e deixa 
-	 * seu cÃ³digo muito mais limpo. Geralmente, seus comandos SQL conterÃ£o valores 
-	 * vindos de variÃ¡veis do programa Java; usando Statements,vocÃª terÃ¡ que fazer 
-	 * muitas concatenaÃ§Ãµes, mas usando PreparedStatements, isso Â�ca mais limpo e 
-	 * fÃ¡cil.
-	 * 
-	 * 
-	 * 
-	 * 
-	 */
+```
+Mas a classe PreparedStatement é mais indicada, pois deixa o código mais limpo e será preciso fazer muitas concatenações para os valores do comando SQL.
 
+## Javabeans
 
+É a representação da entidade no banco através de classes que possuem o contrutor sem argumentos e possuem métodos do tipo <b>get</b> e <b>set</b> para cada um de seus parâmetros. Usa-se Javabeans em qualquer situação que precisa-se representar o modelo de dados.
 
+Neste projeto o Javabean utilizado é a classe <b>Contato</b>
+```java
+public class Contato {
+	
+	private Long id;
+	private String nome;
+	private String email;
+	private String endereco;
+	private Calendar dataNascimento;
+	
+	public Long getId(){
+		return id;
+	}
+	
+	public void setId(Long id){
+		this.id = id;
+	}
+	
+	public String getNome(){
+		return nome;
+	}
+	
+	public void setNome(String nome){
+		this.nome = nome;
+	}
+	
+	public String getEmail(){
+		return email;
+	}
+	
+	public void setEmail(String email){
+		this.email = email;
+	}
+	
+	public String getEndereco(){
+		return endereco;
+	}
+	
+	public void setEndereco(String endereco){
+		this.endereco = endereco;
+	}
+	
+	public Calendar getDataNascimento(){
+		return dataNascimento;
+	}
+	
+	public void setDataNascimento(Calendar dataNascimento){
+		this.dataNascimento = dataNascimento;
+	}
+}
+```
 
+## DAO - Data Access Object
 
+A ideia de usar o padrão de projeto DAO é remover o código de acesso ao banco de dados de suas classes de lógica e colocá-lo em uma classe responsável pelo acesso aos dados. Desta forma a manutenção do código fica mais fácil.
 
+Além do mais, pode-se utilizar um único método que será responsável pela inclusão dos dados no banco.
+```java
+//Instancia do Java Bean
+Contato contato = new Contato();
 
+//Preenche seus campos
+contato.setNome("Guilherme");
+contato.setEmail("Guilherme@teste.com");
+contato.setEndereco("R. Lantejoula, 298 - Abstergo");
+contato.setDataNascimento(Calendar.getInstance());
 
+//Instancia do DAO
+ContatoDAO dao = new ContatoDAO();
 
+//Adiciona o objeto Contato
+dao.adicionar(contato);
+```
+Através de uma única classe será possível acessar ao banco de dados e somente através dessa classe será possível acessar os dados. Este padrão permite a implementação de uma camada adicional de segurança aos dados do BD.
 
+Conforme visto no snippet acima, precisa-se usar uma classe adicional chamada <b>ContatoDAO</b>que contenha o método adicionar().
+```java
+public class ContatoDAO{
+	private Connection conex;
+	
+	public ContatoDAO(){
+		//Conecta-se ao banco ao se construir sua instância
+		this.conex = new ConnectionFactory().getConnection();
+	}
+	
+	public void adicionar(Contato contato) throws SQLException{
+		String sql = "INSERT INTO contatos"+
+			     "(nome, email,endereco,dataNascimento)"+
+			     "VALUE(?,?,?,?)";
+		try{
+			//Preparando Statment para insersão.
+			PreparedStatement stmt = conex.prepareStatement(sql);
+
+			//Setando valores
+			stmt.setString(1, contato.getNome());
+			stmt.setString(2, contato.getEmail());
+			stmt.setString(3, contato.getEndereco());
+			stmt.setDate(4, new Date(contato.getDataNascimento().getTimeInMillis()));
+
+			//Executa
+			stmt.execute();
+
+			//Encerra
+			stmt.close();
+		}catch(SQLException e){
+			throw new RuntimeException(e);
+		}finally{
+			conex.close();
+		}
+	}
+}
+```
+
+## INSERT via DAO
+
+Podemos realizar uma inserção de dados através da classe <b>TestaInsereDAO</b>.
+```java
+//Instancia do Java Bean
+Contato contato = new Contato();
+
+//Preenche seus campos
+contato.setNome("Guilherme");
+contato.setEmail("Guilherme@teste.com");
+contato.setEndereco("R. Lantejoula, 298 - Abstergo");
+contato.setDataNascimento(Calendar.getInstance());
+
+//Instancia do DAO
+ContatoDAO dao = new ContatoDAO();
+
+//Adiciona o objeto Contato
+dao.adicionar(contato);
+
+//Imprime confirmação de gravação
+System.out.println("Gravado!");
+```
+
+## Consultas ao banco
+
+Para consultas ao banco utilizaremos a interface PreparedStatement, onde adicionamos nosso comando SQL.
+
+Diferente de um INSERT, na consulta temos um retorno. Usamos o método <b>executeQuery</b> para retornar todos os registros de uma determianda query.
+```java
+//Pega a conexão e o Statement
+Connection con = new ConnectionFactory().getConnection();
+String sql = "SELECT * FROM contatos";
+PreparedStatement stmt = con.prepareStatement(sql);
+
+//Executa um select
+ResultSet rs = stmt.executeQuery();
+```
+
+O objeto retornado é do tipo <b>ResultSet</b>, onde podemos navegar por seus registros através do método next().
+```java
+while(rs.next()){
+	String nome = rs.getString("nome");
+	String email = rs.getString("email");
+	String end = rs.getString("endereco");
+	Date data = rs.getDate("dataNascimento");
+	
+	System.out.println(nome+" :: "+email+" :: "+end+" :: "+data);
+
+}
+```
+Esse método retorna false quando chega ao fim dos registros, sendo ideal para fazer laços nos registros.
+
+## Recurso avançado: o cursor
+
+Assim como no cursor de um banco de dados, só é possível mover para o próximo registro. Para fazer uma leitura para trás, é preciso especificar na abertura do ResultSet que o cursor será utilizado.
