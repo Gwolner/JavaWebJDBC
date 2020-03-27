@@ -1,6 +1,6 @@
 # Java Web - JDBC
 
-Estudo do JDBC tendo como base a apostila Java para Desenvolvimento Web da Caelum, usando o design patterns DAO (Data Access Object), uma fábrica	de	conexões ao BD MySQL e o Connector/J (mysql connector java).
+Estudo do JDBC usando o design patterns DAO (Data Access Object), uma fábrica	de	conexões ao BD MySQL e o Connector/J (mysql connector java).
 
 ## Persistência
 
@@ -311,3 +311,7 @@ Esse método retorna false quando chega ao fim dos registros, sendo ideal para f
 ## Recurso avançado: o cursor
 
 Assim como no cursor de um banco de dados, só é possível mover para o próximo registro. Para fazer uma leitura para trás, é preciso especificar na abertura do ResultSet que o cursor será utilizado.
+
+## Material de apoio
+
+Este projeto para estudo do JDBC foi realizado com base na prática e teoria abordado nas apostila [Java para Desenvolvimento Web](https://www.caelum.com.br/apostila-java-web/), da Caelum. Esta apostila gratúita é distribuido pela Caelum e faz parte do curso FJ-21.
