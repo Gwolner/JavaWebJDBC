@@ -26,7 +26,7 @@ public class TestaInsereDAO {
 		//Adiciona o objeto Contato
 		dao.adicionar(contato);
 		
-		//Imprime confirmaÃ§Ã£o de gravaÃ§Ã£o
+		//Imprime confirmação de gravação
 		System.out.println("Gravado!");
 		
 		

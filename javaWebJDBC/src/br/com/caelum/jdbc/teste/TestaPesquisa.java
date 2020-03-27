@@ -9,25 +9,6 @@ import java.sql.SQLException;
 import br.com.caelum.jdbc.ConnectionFactory;
 
 public class TestaPesquisa {
-	/*
-	 * Para pesquisar também utilizamos a interface PreparedStatement para montar nosso comando SQL.
-Mas como uma pesquisa possui um retorno (diferente de uma simples inserção), usaremos o método
-executeQuery que retorna todos os registros de uma determinada query.
- *
- *O objeto retornado é do tipo ResultSet do JDBC, o que nos permite navegar por seus registros através do
-método next. Esse método retornará false quando chegar ao m da pesquisa, portanto ele é normalmente
-utilizado para fazer um laço nos registros:
- *
- *
- *Recursos avançados: o cursor
-Assim como o cursor do banco de dados, só é possível mover para o próximo registro. Para
-permitir um processo de leitura para trás é necessário especicar na abertura do ResultSet que
-tal cursor deve ser utilizado.
- *
- *
- *
- *
- */
 	
 	public static void main(String[] args) throws SQLException {
 		
@@ -39,8 +20,8 @@ tal cursor deve ser utilizado.
 		//Executa um select
 		ResultSet rs = stmt.executeQuery();
 		
-		//Exibição opcional do nome das colunas
-		System.out.println("Nome :: E-mail :: Endereço :: Data de Nascimento");
+		//ExibiÃ§Ã£o opcional do nome das colunas
+		System.out.println("Nome :: E-mail :: EndereÃ§o :: Data de Nascimento");
 		
 		//Itera no ResultSet
 		while(rs.next()){

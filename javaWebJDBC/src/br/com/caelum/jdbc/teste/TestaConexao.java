@@ -9,14 +9,14 @@ public class TestaConexao {
 
 	public static void main(String[] args) throws SQLException {
 		
-		//Cria uma inst√¢ncia de conex√£o 
+		//Cria uma inst‚ncia de conex„o 
 		Connection con = new ConnectionFactory().getConnection();
 		
-		System.out.println("Conex√£o aberta!!");
+		System.out.println("Conex„o£o aberta!!");
 		
-		//Encerra a conex√£o 
+		//Encerra a conex„o
 		con.close();
 		
-		System.out.println("Conex√£o fechada!");
+		System.out.println("Conex„o£o fechada!");
 	}
 }
