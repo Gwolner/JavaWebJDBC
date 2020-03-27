@@ -34,12 +34,11 @@ Para fazer o download desta versão ou de uma mais recente, pode-se visitar o si
 O driver deve ser adicionado ao projeto por exportação de arquivos externos do tipo `.jar`.</br>
 No Eclipse, IDE utilizada neste projeto, o caminho utilizado foi: 
 
-`Clique direito sobre o projeto > Build Path > Add	to Build Path`
+<b><i>Clique direito sobre o projeto > Build Path > Add	to Build Path</i></b>
  
  ## Banco MySQL
  
 O banco MySQL que usaremos se chamará <b>bd_jdbc</b> e para criá-lo usamos:
-
 ```mysql
 CREATE DATABASE bd_jdbc;
 ```
@@ -47,7 +46,6 @@ CREATE DATABASE bd_jdbc;
 ## Fábrica de conexões
 
 A classe ConnectionFactory é usada para implementar a fábrica, onde o objeto Connection tem sua construção encapsulada. Desta forma, além de evitar repetição de código para cada nova conexão, concentra em uma única classe os parametos que precisam ser alterados.
-
 ```java
 public Connection getConnection(){
   try{
@@ -65,7 +63,6 @@ Na prática, um sistema que usa JSBC deve usar um Pool de conexões para disponi
 ## Testando a conexão
 
 A classe <b>TestaConexao</b> serve para confirmar que a versão do driver utilizado é compatível com a versão do BD, que a fábrica está funcnionando corretamente e que banco criado está acessível para conexões externas provenientes do projeto.
-
 ```java
 //Cria uma instância de conexão
 Connection con = new ConnectionFactory().getConnection();
@@ -77,7 +74,6 @@ con.close();
 ## Inserindo dados
 
 Para inserir dados em uma tabela de um banco entidade-relacionamento basta usar a clausura INSERT e, claro, especificando quais campos desejamos inserir valores.
-
 ```java
 String sql = "insert into contatos " +
              "(nome,email,endereco, dataNascimento)" +
@@ -86,61 +82,55 @@ String sql = "insert into contatos " +
 Porém aqui tem-se o clássico problema de "Joana D'arc", tambem chamado de <b>SQL Injection</b>, onde uma aspas adicional, sem fechamento, é introduzida no sistema, quebrandpo todo o código que se apresenta conforma a disposição acima. O que resolveria isso seria introduzir sempre o caractere de escape após as aspas, porém nem todo o usuario conhece e, muito menos, fará isto.
 
 Outro problema acima é na data. Ela precisa ser passada como String para o banco, sendo assim, deve-se sempre fazer a conversão do objeto `java.util.Calendar`para String. Por esses motivos não usaremos o código SQL como mostrado e sim de uma forma mais interessante.
-
 ```java
 String sql = "insert into contatos"+
              "(nome,email,endereco,dataNascimento)"+
              "value (?,?,?,?)";
-````
-As interrogações representam os dados que desejamos inserir. Este código SQL é chamado de <b>statement</b>. As cláusulas são executadas em um BD através da interface <b>PreparedStatement</b>. Basta chamar o método <b>prepareStatement</b>, passando como argumento o comando SQL com os valores vindos de variáveis
 
-  * As clÃ¡usulas sÃ£o executadas em um banco de dados atravÃ©s da interface 
-	 * PreparedStatement. Para receber um PreparedStatement relativo Ã  conexÃ£o,
-	 * basta chamar o mÃ©todo prepareStatement, passando como argumento o comando
-	 * SQL com os valores vindos de variÃ¡veis preenchidos com uma interrogaÃ§Ã£o.
-	 * 
-	 * Logo em seguida, chamamos o mÃ©todo setString do PreparedStatement para 
-	 * preencher os valores que sÃ£o do tipo String, passando a posiÃ§Ã£o (comeÃ§ando
-	 * em Ã•) da interrogaÃ§Ã£o no SQL e o valor que deve ser colocado:
-	 * 
-	 * Precisamos definir tambÃ©m a data de nascimento do nosso contato, para isso,
-	 * precisaremos de um objeto do tipo java.sql.Date para passarmos para o nosso
-	 * PreparedStatement. Nesse exemplo, vamos passar a data atual. Para isso, 
-	 * vamos passar um long que representa os milissegundos da data atual para 
-	 * dentro de um java.sql.Date que Ã© o tipo suportado pela API JDBC. Vamos 
-	 * utilizar a classe Calendar para conseguirmos esses milissegundos:
-	 * 
-	 * java.sql.Date dataParaGravar = new java.sql.Date(
-Calendar.getInstance().getTimeInMillis());
+PreparedStatement stmt = con.prepareStatement(sql);
+````
+
+As interrogações representam os dados que desejamos inserir. Este código SQL é chamado de <b>statement</b>. As cláusulas são executadas em um BD através da interface <b>PreparedStatement</b>. Basta chamar o método <b>prepareStatement</b>, passando como argumento o comando SQL contendo as interrogações.
+
+Usamos o método <b>setString</b> do PreparedStatement para preencher os valores, passando a posição (começando em 1) e o valor (como String).
+```java
+stmt.setString(1, "Guilherme");
+stmt.setString(2, "Guilherme@teste.com");
+stmt.setString(3, "R. SQL 295 Workbench");
+```
+
+Para representar a data foi usado o objeto `java.sql.Date`. Neste exemplo, está sendo passado a ata atual, passando um long que representa os milissegundos.
+```java
+java.sql.Date dataParaGravar = new java.sql.Date(Calendar.getInstance().getTimeInMillis());
 stmt.setDate(4, dataParaGravar);
-	 * 
-	 * Fechando conexÃ£o apropriadamente
-	 * 
-	 * NÃ£o Ã© comumutilizar JDBCdiretamente hoje em dia. O mais praticado Ã© o uso 
-	 * de alguma API deORMcomo a JPA ou o Hibernate. Tanto na JDBC quanto em 
-	 * bibliotecas ORM deve-se prestar atenÃ§Ã£o no momento de fechar a conexÃ£o.
-	 * O comum Ã© fechar a conexÃ£o em um bloco finally:
-	 * 
-	 * 
-	 * Dessa forma,mesmo que o cÃ³digo dentro do try lance exception, o con.close()
-	 * serÃ¡ executado. Garantimos que nÃ£o deixaremos uma conexÃ£o pendurada sem uso. 
-	 * Esse cÃ³digo pode Â�car muito maior se quisermos ir alÃ©m. Pois o que acontece 
-	 * no caso de con.close lanÃ§ar uma exception? Quem a tratarÃ¡?
-	 * 
-	 * Trabalhar com recursos caros, como conexÃµes, sessÃµes, threads e arquivos, 
-	 * sempre deve ser muito bem pensado. Deve-se tomar cuidado para nÃ£o deixar 
-	 * nenhum desses recursos abertos, pois poderÃ¡ vazar algo precioso da nossa 
-	 * aplicaÃ§Ã£o. Como veremos durante o curso, Ã© importante centralizar esse tipo 
-	 * de cÃ³digo em algum lugar, para nÃ£o repetir uma tarefa complicada como essa.
-	 * 
-	 * AlÃ©m disso, hÃ¡ a estrutura do Java ÃŸ conhecida como try-with-resources. 
-	 * Ela permite declarar e inicializar,dentro do try, objetos que implementam 
-	 * AutoCloseable. Dessa forma, ao tÃ©rmino do try, o prÃ³prio compilador inserirÃ¡ 
-	 * instruÃ§Ãµes para invocar o close desses recursos, alÃ©m de se precaver em 
-	 * relaÃ§Ã£o a exceÃ§Ãµes que podem surgir por causa dessa invocaÃ§Ã£o. Nosso cÃ³digo 
-	 * ficaria mais reduzido e organizado, alÃ©m do escopo de con sÃ³ valer dentro 
-	 * do try.
-	 * 
+```
+
+Por fim, o método <b>execute()</b> do objeto PreparedStatement executa o comando SQL.
+```java
+stmt.execute();
+```
+
+## Fechando apropriadamente a conexão <b></b>
+
+É comum que fechar uma conexão em um bloco <i>finally</i>, desta forma, mesmo que o código dentro do <i>try</i> lance uma <i>exception</i>, não ficará com este recurso aberto, pois poderá vazar algo precioso da aplicação
+```java
+Connection con = null;
+
+try {
+	con = new ConnectionFactory().getConnection();
+	
+	//Resto do código...
+	
+}catch(SQLException e) {
+	System.out.println(e);
+}finally {
+	con.close();
+}
+```
+
+Além disto, há a estrutura de Java conhecida como <b>try-with-resources</b> que permite declarar e inicializar objetos dentro do <i>ry</i> que possual a caracteristica de <b>AutoCloseable<b>. Desta forma, ao terminar a execução do bloco <i>try</i>, o compilador invoca o método <b>close()</b> deste objeto. Isso garante que o código fique mais reduzido e organizado.
+
+
 	 * A mÃ¡ pratica Statement
 	 * 
 	 * Em vez de usar o PreparedStatement, vocÃª pode usar uma interface mais simples 
