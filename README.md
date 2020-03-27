@@ -1,6 +1,6 @@
 # Java Web - JDBC
 
-Estudo do JDBC usando o design patterns DAO (Data Access Object), uma fábrica	de	conexões ao BD MySQL e o Connector/J (mysql connector java).
+Estudo do JDBC usando uma fábrica de conexões ao BD MySQL, o driver Connector/J e o design patterns DAO (Data Access Object).
 
 ## Persistência
 
